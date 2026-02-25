@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}NEXUS STORE{% endblock %}</title>
+  {% load static %}
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'void':        '#020408',
+            'surface':     '#0a0f1a',
+            'cyan-neon':   '#00d4ff',
+            'violet-neon': '#8b5cf6',
+            'danger':      '#ff3b5c',
+            'success-neon':'#00ff9d',
+          },
+          fontFamily: {
+            'display': ['Orbitron', 'sans-serif'],
+            'body':    ['DM Sans', 'sans-serif'],
+            'mono':    ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="bg-void text-gray-100 font-body min-h-screen flex flex-col">
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-0 z-50 border-b border-cyan-neon/20" style="background: rgba(10,15,26,0.95); backdrop-filter: blur(16px);">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo -->
+        <a href="{% url 'home' %}" class="flex items-center gap-2 group">
+          <span class="text-cyan-neon text-2xl">⬡</span>
+          <span class="font-display font-black text-lg tracking-widest text-white group-hover:text-cyan-neon transition-colors">NEXUS</span>
+        </a>
+
+        <!-- Nav links (desktop) -->
+        <div class="hidden md:flex items-center gap-6">
+          <a href="{% url 'product_list' %}" class="text-sm font-mono tracking-wide text-gray-400 hover:text-cyan-neon transition-colors uppercase">Products</a>
+          <a href="{% url 'search' %}" class="text-sm font-mono tracking-wide text-gray-400 hover:text-cyan-neon transition-colors uppercase">Search</a>
+        </div>
+
+        <!-- Right actions -->
+        <div class="flex items-center gap-4">
+
+          <!-- Search form -->
+          <form action="{% url 'search' %}" method="GET" class="hidden md:flex items-center">
+            <input type="text" name="q" placeholder="Search..." value="{{ request.GET.q }}"
+              class="bg-surface border border-cyan-neon/20 rounded-l px-3 py-1.5 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-cyan-neon w-40">
+            <button type="submit" class="bg-cyan-neon/10 border border-cyan-neon/20 border-l-0 rounded-r px-3 py-1.5 text-cyan-neon hover:bg-cyan-neon hover:text-void transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </button>
+          </form>
+
+          <!-- Cart -->
+          <a href="{% url 'cart' %}" class="relative flex items-center gap-1 text-gray-300 hover:text-cyan-neon transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            {% if cart_count > 0 %}
+              <span class="absolute -top-2 -right-2 bg-cyan-neon text-void text-xs font-mono font-bold w-4 h-4 rounded-full flex items-center justify-center">{{ cart_count }}</span>
+            {% endif %}
+          </a>
+
+          <!-- User menu -->
+          {% if user.is_authenticated %}
+            <div class="relative group">
+              <button class="flex items-center gap-2 text-sm text-gray-300 hover:text-cyan-neon transition-colors font-mono">
+                <span class="w-7 h-7 rounded-full bg-cyan-neon/20 border border-cyan-neon/40 flex items-center justify-center text-cyan-neon text-xs">{{ user.username|first|upper }}</span>
+                <span class="hidden md:inline">{{ user.username }}</span>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div class="absolute right-0 mt-2 w-44 glass-card py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-300 hover:text-cyan-neon hover:bg-cyan-neon/5 transition-colors">Profile</a>
+                <a href="{% url 'order_list' %}" class="block px-4 py-2 text-sm text-gray-300 hover:text-cyan-neon hover:bg-cyan-neon/5 transition-colors">My Orders</a>
+                <a href="{% url 'edit_profile' %}" class="block px-4 py-2 text-sm text-gray-300 hover:text-cyan-neon hover:bg-cyan-neon/5 transition-colors">Edit Profile</a>
+                <div class="border-t border-cyan-neon/10 my-1"></div>
+                <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-danger hover:bg-danger/5 transition-colors">Logout</a>
+              </div>
+            </div>
+          {% else %}
+            <a href="{% url 'login' %}" class="btn-neon text-sm py-1.5 px-4">LOGIN</a>
+            <a href="{% url 'register' %}" class="hidden md:block text-sm font-mono text-gray-400 hover:text-white transition-colors">Register</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- TOAST MESSAGES -->
+  {% if messages %}
+    <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2">
+      {% for message in messages %}
+        <div class="toast-msg glass-card px-5 py-3 flex items-center gap-3 min-w-64 shadow-lg
+          {% if message.tags == 'success' %}border-success-neon/40 text-success-neon
+          {% elif message.tags == 'error' %}border-danger/40 text-danger
+          {% elif message.tags == 'warning' %}border-yellow-400/40 text-yellow-400
+          {% else %}border-cyan-neon/40 text-cyan-neon{% endif %}">
+          <span class="text-sm font-mono">{{ message }}</span>
+          <button onclick="this.parentElement.remove()" class="ml-auto opacity-60 hover:opacity-100 text-lg">&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-cyan-neon/10 bg-surface mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-cyan-neon text-2xl">⬡</span>
+            <span class="font-display font-black tracking-widest text-white">NEXUS STORE</span>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed">The future of shopping. Premium products delivered to your door at the speed of light.</p>
+        </div>
+        <div>
+          <h4 class="font-mono text-cyan-neon text-xs tracking-widest uppercase mb-4">Navigate</h4>
+          <ul class="space-y-2">
+            <li><a href="{% url 'home' %}" class="text-gray-500 text-sm hover:text-cyan-neon transition-colors">Home</a></li>
+            <li><a href="{% url 'product_list' %}" class="text-gray-500 text-sm hover:text-cyan-neon transition-colors">Products</a></li>
+            <li><a href="{% url 'cart' %}" class="text-gray-500 text-sm hover:text-cyan-neon transition-colors">Cart</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-mono text-cyan-neon text-xs tracking-widest uppercase mb-4">Account</h4>
+          <ul class="space-y-2">
+            {% if user.is_authenticated %}
+              <li><a href="{% url 'profile' %}" class="text-gray-500 text-sm hover:text-cyan-neon transition-colors">Profile</a></li>
+              <li><a href="{% url 'order_list' %}" class="text-gray-500 text-sm hover:text-cyan-neon transition-colors">Orders</a></li>
+            {% else %}
+              <li><a href="{% url 'login' %}" class="text-gray-500 text-sm hover:text-cyan-neon transition-colors">Login</a></li>
+              <li><a href="{% url 'register' %}" class="text-gray-500 text-sm hover:text-cyan-neon transition-colors">Register</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-cyan-neon/10 mt-8 pt-6 flex items-center justify-between">
+        <p class="text-gray-600 text-xs font-mono">© 2024 NEXUS STORE. All rights reserved.</p>
+        <p class="text-gray-700 text-xs font-mono">Built with Django 4.2</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="{% static 'js/main.js' %}"></script>
+
+  <!-- Auto-dismiss toasts -->
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.toast-msg').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateX(100%)';
+        el.style.transition = 'all 0.4s ease';
+        setTimeout(() => el.remove(), 400);
+      });
+    }, 4000);
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Order {{ order.order_number }} — NEXUS STORE{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <p class="font-mono text-cyan-neon text-xs tracking-widest uppercase mb-1">Order Details</p>
+      <h1 class="font-display text-2xl font-bold text-white">{{ order.order_number }}</h1>
+    </div>
+    <span class="text-xs font-mono px-3 py-1.5 rounded
+      {% if order.status == 'delivered' %}bg-success-neon/10 text-success-neon border border-success-neon/30
+      {% elif order.status == 'cancelled' %}bg-danger/10 text-danger border border-danger/30
+      {% elif order.status == 'shipped' %}bg-violet-neon/10 text-violet-neon border border-violet-neon/30
+      {% else %}bg-cyan-neon/10 text-cyan-neon border border-cyan-neon/30{% endif %}">
+      {{ order.get_status_display }}
+    </span>
+  </div>
+
+  <!-- Status timeline -->
+  {% if order.status != 'cancelled' %}
+    <div class="glass-card rounded-xl p-5 mb-6">
+      <div class="flex items-center justify-between">
+        {% for step, is_done in order.status_steps %}
+          <div class="flex flex-col items-center flex-1">
+            <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center mb-2
+              {% if is_done %}border-cyan-neon bg-cyan-neon/20{% else %}border-gray-700{% endif %}">
+              {% if is_done %}
+                <svg class="w-4 h-4 text-cyan-neon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              {% else %}
+                <div class="w-2 h-2 rounded-full bg-gray-700"></div>
+              {% endif %}
+            </div>
+            <p class="text-xs font-mono uppercase tracking-wider {% if is_done %}text-cyan-neon{% else %}text-gray-600{% endif %}">{{ step }}</p>
+          </div>
+          {% if not forloop.last %}
+            <div class="h-px flex-1 -mt-6 {% if is_done %}bg-cyan-neon/40{% else %}bg-gray-800{% endif %}"></div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Items -->
+  <div class="glass-card rounded-xl p-6 mb-6">
+    <h2 class="font-mono text-xs text-cyan-neon/70 uppercase tracking-widest mb-4">Items</h2>
+    <div class="space-y-4">
+      {% for item in order.items.all %}
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-lg bg-surface overflow-hidden shrink-0">
+            {% if item.image %}
+              <img src="{{ item.image }}" alt="{{ item.name }}" class="w-full h-full object-cover">
+            {% else %}
+              <div class="w-full h-full flex items-center justify-center text-gray-600 text-xl">⬡</div>
+            {% endif %}
+          </div>
+          <div class="flex-1">
+            <p class="text-sm text-white">{{ item.name }}</p>
+            <p class="text-xs text-gray-500 font-mono">${{ item.price }} × {{ item.quantity }}</p>
+          </div>
+          <p class="font-mono text-sm text-white">${{ item.total_price }}</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="border-t border-cyan-neon/10 mt-4 pt-4 space-y-2">
+      <div class="flex justify-between text-sm"><span class="text-gray-400">Subtotal</span><span class="font-mono text-white">${{ order.subtotal }}</span></div>
+      <div class="flex justify-between text-sm"><span class="text-gray-400">Shipping</span><span class="font-mono text-white">${{ order.shipping_cost }}</span></div>
+      <div class="flex justify-between pt-2 border-t border-cyan-neon/10"><span class="font-medium text-white">Total</span><span class="font-mono font-bold text-cyan-neon text-lg">${{ order.total }}</span></div>
+    </div>
+  </div>
+
+  <!-- Shipping info -->
+  <div class="glass-card rounded-xl p-6 mb-6">
+    <h2 class="font-mono text-xs text-cyan-neon/70 uppercase tracking-widest mb-4">Shipping Address</h2>
+    <p class="text-white text-sm">{{ order.full_name }}</p>
+    <p class="text-gray-400 text-sm">{{ order.email }}</p>
+    {% if order.phone %}<p class="text-gray-400 text-sm">{{ order.phone }}</p>{% endif %}
+    <p class="text-gray-400 text-sm mt-2">{{ order.address }}</p>
+    <p class="text-gray-400 text-sm">{{ order.city }}{% if order.postal_code %}, {{ order.postal_code }}{% endif %}</p>
+  </div>
+
+  <!-- Meta -->
+  <div class="flex items-center justify-between text-xs font-mono text-gray-600">
+    <span>Placed {{ order.created_at|date:"d M Y, H:i" }}</span>
+    {% if order.is_paid %}<span class="text-success-neon">✓ PAID</span>{% endif %}
+  </div>
+
+  <div class="mt-6">
+    <a href="{% url 'order_list' %}" class="text-sm font-mono text-gray-400 hover:text-cyan-neon transition-colors">← Back to Orders</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --bg-void:       #020408;
+  --bg-surface:    #0a0f1a;
+  --bg-card:       rgba(255, 255, 255, 0.03);
+  --accent-cyan:   #00d4ff;
+  --accent-violet: #8b5cf6;
+  --text-primary:  #e8f4f8;
+  --text-muted:    #4a6572;
+  --border-glow:   rgba(0, 212, 255, 0.15);
+  --danger:        #ff3b5c;
+  --success:       #00ff9d;
+  --warning:       #ffaa00;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-void);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ─── Glass Card ─────────────────────────── */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+}
+
+/* ─── Neon Button ────────────────────────── */
+.btn-neon {
+  display: inline-block;
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  background: transparent;
+  padding: 10px 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 6px;
+}
+.btn-neon:hover:not(:disabled) {
+  background: var(--accent-cyan);
+  color: var(--bg-void);
+  box-shadow: 0 0 24px rgba(0, 212, 255, 0.35);
+  text-decoration: none;
+}
+.btn-neon:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Product Card ───────────────────────── */
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(0, 212, 255, 0.12);
+}
+
+/* ─── Category Card ──────────────────────── */
+.category-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 212, 255, 0.1);
+}
+
+/* ─── Badge ──────────────────────────────── */
+.badge-sale {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ─── Star Background ────────────────────── */
+.stars-bg {
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(0, 212, 255, 0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 15%, rgba(0, 212, 255, 0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 40%, rgba(139, 92, 246, 0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 85%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 65% 35%, rgba(0, 212, 255, 0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 70%, rgba(139, 92, 246, 0.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 40% 45%, rgba(255,255,255,0.15) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 10%, rgba(0, 212, 255, 0.5) 0%, transparent 100%);
+}
+
+/* ─── Animations ─────────────────────────── */
+@keyframes glitch {
+  0%, 100% { text-shadow: 2px 0 var(--accent-cyan), -2px 0 var(--accent-violet); }
+  25%       { text-shadow: -2px 0 var(--accent-cyan), 2px 0 var(--accent-violet); }
+  50%       { text-shadow: 2px 2px var(--accent-violet), -2px -2px var(--accent-cyan); }
+  75%       { text-shadow: -2px 2px var(--accent-cyan), 2px -2px var(--accent-violet); }
+}
+.glitch-text {
+  animation: glitch 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-16px); }
+}
+.floating {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-surface) 25%, #1a2535 50%, var(--bg-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Toast ──────────────────────────────── */
+.toast-msg {
+  animation: fadeInDown 0.35s ease;
+}
+
+/* ─── Scrollbar ──────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-void); }
+::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 4px; }
+
+/* ─── Form inputs focus glow ─────────────── */
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+}
+
+/* ─── Tables ─────────────────────────────── */
+table { width: 100%; border-collapse: collapse; }
+
+/* ─── Utility ────────────────────────────── */
+.text-void    { color: var(--bg-void); }
+.text-muted   { color: var(--text-muted); }
+.bg-void-color { background-color: var(--bg-void); }

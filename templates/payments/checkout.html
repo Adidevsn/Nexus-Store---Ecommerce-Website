@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Checkout — NEXUS STORE{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <div class="mb-8">
+    <p class="font-mono text-cyan-neon text-xs tracking-widest uppercase mb-1">Almost there</p>
+    <h1 class="font-display text-2xl font-bold text-white">Checkout</h1>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Shipping form -->
+    <div class="lg:col-span-2">
+      <form method="POST" action="{% url 'create_checkout_session' %}">
+        {% csrf_token %}
+
+        <div class="glass-card rounded-xl p-6 mb-6">
+          <h2 class="font-mono text-xs text-cyan-neon uppercase tracking-widest mb-5">Shipping Information</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2">
+              <label class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-1">Full Name</label>
+              <input type="text" name="full_name" required
+                     value="{{ user.get_full_name|default:user.username }}"
+                     class="w-full bg-surface border border-cyan-neon/20 rounded-lg px-4 py-2.5 text-gray-200 text-sm focus:outline-none focus:border-cyan-neon">
+            </div>
+            <div class="col-span-2">
+              <label class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-1">Phone</label>
+              <input type="text" name="phone" value="{{ profile.phone|default:'' }}"
+                     class="w-full bg-surface border border-cyan-neon/20 rounded-lg px-4 py-2.5 text-gray-200 text-sm focus:outline-none focus:border-cyan-neon">
+            </div>
+            <div class="col-span-2">
+              <label class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-1">Street Address</label>
+              <textarea name="address" rows="2" required
+                        class="w-full bg-surface border border-cyan-neon/20 rounded-lg px-4 py-2.5 text-gray-200 text-sm focus:outline-none focus:border-cyan-neon resize-none">{{ profile.address|default:'' }}</textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-1">City</label>
+              <input type="text" name="city" required value="{{ profile.city|default:'' }}"
+                     class="w-full bg-surface border border-cyan-neon/20 rounded-lg px-4 py-2.5 text-gray-200 text-sm focus:outline-none focus:border-cyan-neon">
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-gray-500 uppercase tracking-wider mb-1">Postal Code</label>
+              <input type="text" name="postal_code" value="{{ profile.postal_code|default:'' }}"
+                     class="w-full bg-surface border border-cyan-neon/20 rounded-lg px-4 py-2.5 text-gray-200 text-sm focus:outline-none focus:border-cyan-neon">
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment section -->
+        <div class="glass-card rounded-xl p-6">
+          <h2 class="font-mono text-xs text-cyan-neon uppercase tracking-widest mb-3">Payment</h2>
+          <div class="flex items-center gap-3 p-4 bg-cyan-neon/5 border border-cyan-neon/20 rounded-lg">
+            <svg class="w-6 h-6 text-cyan-neon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <div>
+              <p class="text-sm text-white font-medium">Secure Payment via Stripe</p>
+              <p class="text-xs text-gray-500">You'll be redirected to Stripe's secure payment page. We never store your card data.</p>
+            </div>
+          </div>
+          <button type="submit" class="btn-neon w-full py-3 mt-4 text-sm tracking-widest">
+            PAY ${{ total }} SECURELY →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Order summary -->
+    <div class="glass-card rounded-xl p-6 h-fit sticky top-24">
+      <h2 class="font-mono text-xs text-cyan-neon uppercase tracking-widest mb-5">Order Summary</h2>
+      <div class="space-y-3 mb-4">
+        {% for item in items %}
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-400 truncate mr-2">{{ item.name }} <span class="text-gray-600">×{{ item.quantity }}</span></span>
+            <span class="font-mono text-white shrink-0">${{ item.total }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="border-t border-cyan-neon/10 pt-3 space-y-2">
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-400">Subtotal</span>
+          <span class="font-mono text-white">${{ cart.get_total_price }}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-400">Shipping</span>
+          <span class="font-mono text-white">${{ shipping }}</span>
+        </div>
+        <div class="border-t border-cyan-neon/10 pt-2 flex justify-between">
+          <span class="font-medium text-white">Total</span>
+          <span class="font-mono font-bold text-cyan-neon text-lg">${{ total }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

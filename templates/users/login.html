@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Login — NEXUS STORE{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-16 px-4 relative">
+  <!-- BG decoration -->
+  <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(ellipse at center, rgba(0,212,255,0.05) 0%, transparent 70%);"></div>
+
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <a href="{% url 'home' %}" class="text-5xl text-cyan-neon">⬡</a>
+      <h1 class="font-display text-2xl font-bold text-white mt-3">Welcome Back</h1>
+      <p class="text-gray-500 text-sm mt-1">Sign in to your NEXUS account</p>
+    </div>
+
+    <div class="glass-card rounded-2xl p-8">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="space-y-5">
+          {% for field in form %}
+            <div>
+              <label class="block text-xs font-mono text-cyan-neon/70 uppercase tracking-wider mb-2">{{ field.label }}</label>
+              <input type="{{ field.field.widget.input_type }}"
+                     name="{{ field.html_name }}"
+                     id="{{ field.auto_id }}"
+                     {% if field.value %}value="{{ field.value }}"{% endif %}
+                     class="w-full bg-surface border border-cyan-neon/20 rounded-lg px-4 py-3 text-gray-200 text-sm focus:outline-none focus:border-cyan-neon transition-colors placeholder-gray-600"
+                     placeholder="{{ field.label }}">
+              {% if field.errors %}
+                {% for error in field.errors %}
+                  <p class="text-danger text-xs mt-1 font-mono">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-neon w-full py-3 mt-6 text-sm tracking-widest">
+          SIGN IN →
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <p class="text-gray-500 text-sm">Don't have an account?
+          <a href="{% url 'register' %}" class="text-cyan-neon hover:underline">Create one</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% load static %}
+<div class="product-card glass-card rounded-xl overflow-hidden relative group">
+  <!-- Sale badge -->
+  {% if product.is_on_sale %}
+    <div class="absolute top-3 left-3 z-10">
+      <span class="badge-sale">SALE</span>
+    </div>
+  {% endif %}
+
+  <!-- Out of stock overlay -->
+  {% if not product.in_stock %}
+    <div class="absolute inset-0 bg-void/60 z-10 flex items-center justify-center">
+      <span class="font-mono text-sm text-gray-400 tracking-widest uppercase border border-gray-600 px-4 py-2 rounded">Out of Stock</span>
+    </div>
+  {% endif %}
+
+  <!-- Image -->
+  <a href="{% url 'product_detail' product.slug %}" class="block overflow-hidden h-52">
+    {% if product.image %}
+      <img src="{{ product.image.url }}" alt="{{ product.name }}"
+           class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+    {% else %}
+      <div class="w-full h-full bg-surface flex items-center justify-center">
+        <span class="text-gray-600 text-4xl">⬡</span>
+      </div>
+    {% endif %}
+  </a>
+
+  <!-- Content -->
+  <div class="p-4">
+    {% if product.category %}
+      <p class="text-xs font-mono text-cyan-neon/60 uppercase tracking-wider mb-1">{{ product.category.name }}</p>
+    {% endif %}
+    <a href="{% url 'product_detail' product.slug %}">
+      <h3 class="text-sm font-medium text-gray-200 hover:text-cyan-neon transition-colors mb-2 leading-snug">{{ product.name }}</h3>
+    </a>
+
+    <!-- Price -->
+    <div class="flex items-center gap-2 mb-3">
+      <span class="font-mono font-bold text-cyan-neon">${{ product.effective_price }}</span>
+      {% if product.is_on_sale %}
+        <span class="font-mono text-xs text-gray-500 line-through">${{ product.price }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Stock warning -->
+    {% if product.in_stock and product.stock <= 5 %}
+      <p class="text-xs text-yellow-400 font-mono mb-2">Only {{ product.stock }} left!</p>
+    {% endif %}
+
+    <!-- Add to cart -->
+    <form method="POST" action="{% url 'cart_add' product.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="quantity" value="1">
+      <button type="submit"
+              class="btn-neon w-full text-xs py-2 {% if not product.in_stock %}opacity-40 cursor-not-allowed{% endif %}"
+              {% if not product.in_stock %}disabled{% endif %}>
+        {% if product.in_stock %}+ ADD TO CART{% else %}OUT OF STOCK{% endif %}
+      </button>
+    </form>
+  </div>
+</div>

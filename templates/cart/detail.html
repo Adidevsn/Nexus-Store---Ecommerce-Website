@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Cart — NEXUS STORE{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <div class="mb-8">
+    <p class="font-mono text-cyan-neon text-xs tracking-widest uppercase mb-1">Shopping</p>
+    <h1 class="font-display text-2xl font-bold text-white">Your Cart
+      {% if cart %}
+        <span class="text-gray-500 text-lg font-body font-normal">({{ cart|length }} items)</span>
+      {% endif %}
+    </h1>
+  </div>
+
+  {% if items %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Items list -->
+      <div class="lg:col-span-2 space-y-4">
+        {% for item in items %}
+          <div class="glass-card rounded-xl p-4 flex items-center gap-4" id="cart-item-{{ item.id }}">
+            <!-- Image -->
+            <div class="w-20 h-20 rounded-lg overflow-hidden bg-surface shrink-0">
+              {% if item.image %}
+                <img src="{{ item.image }}" alt="{{ item.name }}" class="w-full h-full object-cover">
+              {% else %}
+                <div class="w-full h-full flex items-center justify-center text-gray-600 text-2xl">⬡</div>
+              {% endif %}
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-medium text-white truncate">{{ item.name }}</h3>
+              <p class="text-xs font-mono text-cyan-neon mt-0.5">${{ item.price }}</p>
+            </div>
+
+            <!-- Quantity -->
+            <form method="POST" action="{% url 'cart_update' item.id %}" class="flex items-center gap-2">
+              {% csrf_token %}
+              <div class="flex items-center border border-cyan-neon/20 rounded overflow-hidden">
+                <button type="button" class="qty-minus w-8 h-8 text-cyan-neon hover:bg-cyan-neon/10 transition-colors font-mono">-</button>
+                <input type="number" name="quantity" value="{{ item.quantity }}" min="0" max="99"
+                       class="w-10 h-8 text-center bg-transparent text-white font-mono text-xs qty-input focus:outline-none">
+                <button type="button" class="qty-plus w-8 h-8 text-cyan-neon hover:bg-cyan-neon/10 transition-colors font-mono">+</button>
+              </div>
+              <button type="submit" class="text-xs text-gray-500 hover:text-cyan-neon font-mono transition-colors">Update</button>
+            </form>
+
+            <!-- Item total -->
+            <div class="text-right shrink-0">
+              <p class="font-mono font-bold text-white text-sm">${{ item.total }}</p>
+            </div>
+
+            <!-- Remove -->
+            <a href="{% url 'cart_remove' item.id %}" class="text-gray-600 hover:text-danger transition-colors ml-1" title="Remove">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </a>
+          </div>
+        {% endfor %}
+
+        <!-- Clear cart -->
+        <div class="flex justify-end">
+          <a href="{% url 'cart_clear' %}" class="text-xs font-mono text-gray-600 hover:text-danger transition-colors">Clear Cart ×</a>
+        </div>
+      </div>
+
+      <!-- Order summary -->
+      <div class="glass-card rounded-xl p-6 h-fit sticky top-24">
+        <h2 class="font-mono text-xs text-cyan-neon uppercase tracking-widest mb-5">Order Summary</h2>
+        <div class="space-y-3 mb-5">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-400">Subtotal</span>
+            <span class="font-mono text-white">${{ cart.get_total_price }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-400">Shipping</span>
+            <span class="font-mono text-white">${{ shipping }}</span>
+          </div>
+          <div class="border-t border-cyan-neon/10 pt-3 flex justify-between">
+            <span class="font-medium text-white">Total</span>
+            <span class="font-mono font-bold text-cyan-neon text-lg">${{ total }}</span>
+          </div>
+        </div>
+
+        {% if user.is_authenticated %}
+          <a href="{% url 'checkout' %}" class="btn-neon w-full block text-center py-3 text-sm">PROCEED TO CHECKOUT →</a>
+        {% else %}
+          <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn-neon w-full block text-center py-3 text-sm">LOGIN TO CHECKOUT →</a>
+          <p class="text-xs text-gray-600 text-center mt-2 font-mono">You must be logged in to checkout</p>
+        {% endif %}
+
+        <a href="{% url 'product_list' %}" class="block text-center text-xs font-mono text-gray-500 hover:text-gray-300 mt-4 transition-colors">← Continue Shopping</a>
+      </div>
+    </div>
+
+  {% else %}
+    <div class="text-center py-24">
+      <div class="text-6xl mb-4 opacity-20">⬡</div>
+      <h2 class="font-display text-2xl text-gray-400 mb-2">Your cart is empty</h2>
+      <p class="text-gray-600 text-sm mb-8">Add some products to get started.</p>
+      <a href="{% url 'product_list' %}" class="btn-neon text-sm px-8 py-3">BROWSE PRODUCTS</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.querySelectorAll('.glass-card').forEach(card => {
+    const minus = card.querySelector('.qty-minus');
+    const plus = card.querySelector('.qty-plus');
+    const input = card.querySelector('.qty-input');
+    if (!input) return;
+    minus?.addEventListener('click', () => { if (parseInt(input.value) > 0) input.value = parseInt(input.value) - 1; });
+    plus?.addEventListener('click', () => { input.value = parseInt(input.value) + 1; });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — NEXUS STORE{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <p class="font-mono text-cyan-neon text-xs tracking-widest uppercase mb-1">Account</p>
+      <h1 class="font-display text-2xl font-bold text-white">My Profile</h1>
+    </div>
+    <a href="{% url 'edit_profile' %}" class="btn-neon text-sm px-5 py-2">EDIT PROFILE</a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <!-- Avatar + name card -->
+    <div class="glass-card rounded-xl p-6 text-center">
+      {% if profile.avatar %}
+        <img src="{{ profile.avatar.url }}" alt="Avatar" class="w-24 h-24 rounded-full object-cover mx-auto mb-4 border-2 border-cyan-neon/30">
+      {% else %}
+        <div class="w-24 h-24 rounded-full bg-cyan-neon/10 border-2 border-cyan-neon/30 flex items-center justify-center mx-auto mb-4">
+          <span class="text-cyan-neon text-3xl font-display font-black">{{ user.username|first|upper }}</span>
+        </div>
+      {% endif %}
+      <h2 class="font-bold text-white text-lg">{{ user.get_full_name|default:user.username }}</h2>
+      <p class="text-gray-500 text-sm font-mono">@{{ user.username }}</p>
+      <p class="text-gray-600 text-xs mt-1">{{ user.email }}</p>
+    </div>
+
+    <!-- Info card -->
+    <div class="md:col-span-2 glass-card rounded-xl p-6">
+      <h3 class="font-mono text-xs text-cyan-neon/70 uppercase tracking-wider mb-4">Contact Information</h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <p class="text-xs text-gray-600 font-mono uppercase mb-1">Phone</p>
+          <p class="text-gray-300 text-sm">{{ profile.phone|default:"—" }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-600 font-mono uppercase mb-1">City</p>
+          <p class="text-gray-300 text-sm">{{ profile.city|default:"—" }}</p>
+        </div>
+        <div class="col-span-2">
+          <p class="text-xs text-gray-600 font-mono uppercase mb-1">Address</p>
+          <p class="text-gray-300 text-sm">{{ profile.address|default:"—" }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-gray-600 font-mono uppercase mb-1">Member Since</p>
+          <p class="text-gray-300 text-sm font-mono">{{ user.date_joined|date:"M Y" }}</p>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-cyan-neon/10">
+        <a href="{% url 'change_password' %}" class="text-xs font-mono text-cyan-neon/60 hover:text-cyan-neon transition-colors">Change Password →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders -->
+  <div>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display text-lg font-bold text-white">Recent Orders</h2>
+      <a href="{% url 'order_list' %}" class="text-sm font-mono text-gray-400 hover:text-cyan-neon">View All →</a>
+    </div>
+
+    {% if orders %}
+      <div class="glass-card rounded-xl overflow-hidden">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-cyan-neon/10">
+              <th class="text-left px-5 py-3 text-xs font-mono text-gray-500 uppercase tracking-wider">Order</th>
+              <th class="text-left px-5 py-3 text-xs font-mono text-gray-500 uppercase tracking-wider">Date</th>
+              <th class="text-left px-5 py-3 text-xs font-mono text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="text-right px-5 py-3 text-xs font-mono text-gray-500 uppercase tracking-wider">Total</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-cyan-neon/5">
+            {% for order in orders|slice:":5" %}
+              <tr class="hover:bg-cyan-neon/5 transition-colors">
+                <td class="px-5 py-3">
+                  <a href="{% url 'order_detail' order.order_number %}" class="font-mono text-sm text-cyan-neon hover:underline">{{ order.order_number }}</a>
+                </td>
+                <td class="px-5 py-3 text-sm text-gray-400 font-mono">{{ order.created_at|date:"d M Y" }}</td>
+                <td class="px-5 py-3">
+                  <span class="text-xs font-mono px-2 py-1 rounded
+                    {% if order.status == 'delivered' %}bg-success-neon/10 text-success-neon
+                    {% elif order.status == 'cancelled' %}bg-danger/10 text-danger
+                    {% elif order.status == 'shipped' %}bg-violet-neon/10 text-violet-neon
+                    {% else %}bg-cyan-neon/10 text-cyan-neon{% endif %}">
+                    {{ order.get_status_display }}
+                  </span>
+                </td>
+                <td class="px-5 py-3 text-right font-mono text-sm text-white">${{ order.total }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="glass-card rounded-xl p-10 text-center">
+        <div class="text-4xl mb-3 opacity-30">⬡</div>
+        <p class="text-gray-500 text-sm">No orders yet. Start shopping!</p>
+        <a href="{% url 'product_list' %}" class="btn-neon mt-4 inline-block text-sm px-6 py-2">Browse Products</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
